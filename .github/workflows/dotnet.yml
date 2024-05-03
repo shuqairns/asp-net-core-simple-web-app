@@ -1,37 +1,28 @@
-name: .NET Core Build and Package
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
 
 on:
   push:
-    branches:
-      - main  # Trigger on pushes to the main branch
+    branches: [ "master" ]
   pull_request:
-    branches:
-      - main  # Trigger on pull requests to the main branch
+    branches: [ "master" ]
 
 jobs:
-  build-and-package:
-    runs-on: ubuntu-latest  # Define the type of runner
+  build:
+
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2  # Checks-out your repository under $GITHUB_WORKSPACE
-
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '3.1.x'  # Specify your .NET Core version
-
+        dotnet-version: 8.0.x
     - name: Restore dependencies
       run: dotnet restore
-
     - name: Build
-      run: dotnet build --configuration Release --no-restore
-
-    - name: Package
-      run: dotnet publish --configuration Release --no-restore --output ${{ github.workspace }}/myapp
-
-    - name: Archive Production Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: myapp-${{ github.sha }}  # Tag the artifact with the commit SHA
-        path: ${{ github.workspace }}/myapp
-
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
